@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Team22 - GUI for Assignment 1</title>
+
+    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
+    <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+
+<body>
+<div class="mdl-card mdl-shadow--1dp mdl-color--green-300">
+
+    <div class="mdl-card__title">
+        <h2 class="mdl-card__title-text">Arduino Control Panel</h2>
+    </div>
+
+    <div class="mdl-card__actions mdl-card--border">
+
+            <table id='mdl-table' class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp">
+                <tbody class="list">
+
+                    <tr>
+                        <td class="mdl-data-table__cell--non-numeric material"> Switch LED on/off </td>
+                        <td>
+                            <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="switch-led">
+                                <input type="checkbox" id="switch-led" class="mdl-switch__input" checked onclick="toggleLed();">
+                                <span class="mdl-switch__label"></span>
+                            </label>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="mdl-data-table__cell--non-numeric material"> Switch motion sensor on/off </td>
+                        <td>
+                            <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="switch-sensor">
+                                <input type="checkbox" id="switch-sensor" class="mdl-switch__input" checked onclick="toggleSensor();">
+                                <span class="mdl-switch__label"></span>
+                            </label>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="mdl-data-table__cell--non-numeric material"> Motions detected </td>
+                        <td>
+                            <label id="motions-counter"> 0 </label>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="mdl-data-table__cell--non-numeric material"> Long motions </td>
+                        <td>
+                            <label id="long-motions-counter"> 0 </label>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td class="mdl-data-table__cell--non-numeric material"> Short motions </td>
+                        <td>
+                            <label id="short-motions-counter"> 0 </label>
+                        </td>
+                    </tr>
+
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+
+<script>
+
+    var socket = io();
+
+    function toggleLed() {
+        var switchLedElem = document.getElementById("switch-led");
+        if (switchLedElem.checked) {
+            socket.emit('toggle-led', 'on');
+        } else {
+            socket.emit('toggle-led', 'off');
+        }
+    }
+
+    function toggleSensor() {
+        var switchSensorElem = document.getElementById("switch-sensor");
+        if (switchSensorElem.checked) {
+            socket.emit('toggle-sensor', 'on');
+        } else {
+            socket.emit('toggle-sensor', 'off');
+        }
+
+    }
+
+    // Listen to events
+
+    socket.on('updateDetectedMotions', function (counter) {
+        var motionsCounterElem = document.getElementById("motions-counter");
+        motionsCounterElem.innerHTML = counter;
+    });
+
+    socket.on('shortMotions', function (counter) {
+        var shortMotionsCounterElem = document.getElementById("short-motions-counter");
+        shortMotionsCounterElem.innerHTML = counter;
+    });
+
+    socket.on('longMotions', function (counter) {
+        var longMotionsCounterElem = document.getElementById("long-motions-counter");
+        longMotionsCounterElem.innerHTML = counter;
+    });
+
+</script>
+
+</html>
